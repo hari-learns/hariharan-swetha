@@ -21,7 +21,7 @@ const state = {
   blessings: Math.max(0, parseInt(store.get('hs-bless') || '0', 10) || 0),
   guests: 2,
 };
-const sound = new Sound();
+const sound = new Sound(C.musicFile || '');
 const fx = new FX($('#fx'));
 const soundBtn = $('#soundBtn'), langBtn = $('#langBtn');
 let sweep = () => {};
@@ -48,7 +48,7 @@ const scene = new Scene($('#gl'), {
 
 function calendarEvents() {
   const g = L(C.couple.groom.name), b = L(C.couple.bride.name);
-  const title = state.lang === 'ta' ? `${g} – ${b} திருமணம்` : `${g} & ${b} · Wedding`;
+  const title = state.lang === 'ta' ? `${g} – ${b} திருமண வரவேற்பு` : `${g} & ${b} · Wedding reception`;
   return [{ start: C.wedding.start, end: C.wedding.end, allDay: !C.wedding.showTime, title, note: '', location: `${C.venue.name.en}, ${C.venue.address.en}` }];
 }
 

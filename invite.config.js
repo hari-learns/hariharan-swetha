@@ -12,6 +12,9 @@ window.INVITE = {
   startLanguage: "en",         // "en" or "ta"
   languageSwitch: false,       // each language has its own link: add ?lang=ta or ?lang=en. true also shows a switch button
   sound: true,                 // music starts when the guest taps the seal
+  // Put an mp3 in this folder and name it here to play it instead of the built-in melody, e.g. "music.mp3".
+  // If the file is missing the built-in melody plays.
+  musicFile: "music.mp3",
 
   couple: {
     groom: {
@@ -28,10 +31,10 @@ window.INVITE = {
     hashtag: "#HariWedsSwetha",                                                      // SAMPLE
   },
 
-  // The wedding day. Add the muhurtham time when it is fixed and set showTime: true.
+  // The day on the invitation: the reception at Woodlands. Add the time when it is fixed and set showTime: true.
   wedding: {
-    start: "2027-02-11T09:00:00+05:30",       // the date is real (11 February 2027); the time is a SAMPLE
-    end:   "2027-02-11T10:30:00+05:30",       // SAMPLE
+    start: "2027-03-11T18:30:00+05:30",       // the date is real (11 March 2027); the time is a SAMPLE
+    end:   "2027-03-11T21:30:00+05:30",       // SAMPLE
     showTime: false,                          // false: the page and the calendar entry show the date only
   },
 
@@ -53,6 +56,6 @@ window.INVITE = {
     // WhatsApp number that receives the replies: country code + number, digits only, e.g. "919876543210".
     // Left empty, the guest's WhatsApp opens with the reply written and they pick your chat themselves.
     whatsapp: "",
-    by: "2027-01-20",                                                                // SAMPLE
+    by: "2027-02-20",                                                                // SAMPLE
   },
 };

@@ -17,7 +17,7 @@ const PHRASES = [
 ];
 
 export class Sound {
-  constructor() { this.ctx = null; this.on = false; this.musicOn = false; this.last = -1; this.prev = null; }
+  constructor(file = '') { this.ctx = null; this.on = false; this.musicOn = false; this.last = -1; this.prev = null; this.file = file; this.el = null; }
 
   get available() { return !!(window.AudioContext || window.webkitAudioContext); }
 
@@ -41,7 +41,8 @@ export class Sound {
     this.noise = nb;
     document.addEventListener('visibilitychange', () => {
       if (!this.ctx) return;
-      if (document.hidden) this.ctx.suspend(); else if (this.on) this.ctx.resume();
+      if (document.hidden) { this.ctx.suspend(); if (this.el) this.el.pause(); }
+      else if (this.on) { this.ctx.resume(); if (this.el) this.el.play().catch(() => {}); }
     });
     return true;
   }
@@ -180,6 +181,18 @@ export class Sound {
   startMusic() {
     if (!this.ctx || this.musicOn) return;
     this.musicOn = true;
+    if (!this.file) { this.melody(); return; }
+    // the couple's own track; if it is missing or will not play, fall back to the built-in melody
+    const a = new Audio(this.file);
+    a.loop = true; a.volume = 0; a.preload = 'auto';
+    a.play().then(() => {
+      this.el = a;
+      let v = 0;
+      const up = setInterval(() => { v = Math.min(0.7, v + 0.035); a.volume = v; if (v >= 0.7) clearInterval(up); }, 120);
+    }).catch((err) => { console.warn('[sound] music file not playing, using the built-in melody:', err && err.name); this.melody(); });
+  }
+
+  melody() {
     const ctx = this.ctx, t = ctx.currentTime;
     this.music.gain.setValueAtTime(0.0001, t);
     this.music.gain.exponentialRampToValueAtTime(0.9, t + 4.5);
