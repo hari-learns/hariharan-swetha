@@ -153,7 +153,7 @@ async function startSound(withPress) {
   if (!ok) return;
   soundBtn.setAttribute('aria-pressed', 'true');
   if (withPress) { sound.play('press'); setTimeout(() => sound.play('doors'), 240); }
-  if (state.revealed) sound.startMusic();        // the opening keeps its own chimes; the music waits for the stage
+  if (state.opened) sound.startMusic();          // the music begins with the tap
 }
 
 function beat(name) {
