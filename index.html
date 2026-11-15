@@ -153,35 +153,6 @@
       </button>
     </section>
 
-    <section class="sec sec--rsvp" id="rsvp" aria-labelledby="rsvpTitle">
-      <svg class="sec__icon rv" width="30" height="30" aria-hidden="true"><use href="#i-mail"/></svg>
-      <h2 class="sec__title rv" id="rsvpTitle" data-t="rsvpTitle">Will you be there?</h2>
-      <div class="dots rv" aria-hidden="true"><i></i><i></i><i></i></div>
-      <form class="rsvp rv" id="rsvpForm" novalidate>
-        <label class="field">
-          <span class="field__label" data-t="fName">Your name</span>
-          <input class="field__input" id="fName" name="name" type="text" autocomplete="name" required>
-        </label>
-        <div class="field" id="guestsField">
-          <span class="field__label" id="guestsLabel" data-t="fGuests">How many of you?</span>
-          <div class="stepper" role="group" aria-labelledby="guestsLabel">
-            <button type="button" id="gMinus" data-ta="fewer" aria-label="One fewer">
-              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 6.6h12v2.8H2z"/></svg>
-            </button>
-            <output id="gOut" aria-live="polite">2</output>
-            <button type="button" id="gPlus" data-ta="more" aria-label="One more">
-              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6.6 2h2.8v4.6H14v2.8H9.4V14H6.6V9.4H2V6.6h4.6z"/></svg>
-            </button>
-          </div>
-        </div>
-        <p class="rsvp__error" id="rsvpError" role="alert" hidden data-t="fNeedName">Please tell us your name.</p>
-        <button class="btn btn--wide" type="submit"><span data-t="fSend">Let Hari and Swetha know</span></button>
-      </form>
-      <div class="rsvp__done" id="rsvpDone" hidden tabindex="-1">
-        <p class="after__line" data-t="thanks">Thank you</p>
-        <button class="textbtn" id="rsvpAgain" type="button" data-t="again">Change my reply</button>
-      </div>
-    </section>
 
     <footer class="foot">
       <button class="mono rv" id="mono" type="button">
