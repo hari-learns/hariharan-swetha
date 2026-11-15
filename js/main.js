@@ -100,7 +100,8 @@ function applyLang() {
   langBtn.lang = lang === 'en' ? 'ta' : 'en';
   langBtn.setAttribute('aria-label', lang === 'en' ? 'தமிழில் படிக்க' : 'Read in English');
   soundBtn.setAttribute('aria-label', s.music);
-  $('.hero__poster-seal').dataset.label = s.seal.lines.join(' ');
+  $('#loaderNames').textContent = `${gn} & ${bn}`;
+  $('#loaderLine').textContent = hero.classList.contains('no-gl') ? s.sealLabel : (lang === 'ta' ? 'அழைப்பிதழ் திறக்கிறது' : 'Opening your invitation');
 
   const evs = calendarEvents();
   const ics = $('#icsBtn');
@@ -358,7 +359,7 @@ async function boot() {
     state.gl = false;
     console.warn('[scene] disabled, showing the still version:', err);
   }
-  if (!state.gl) hero.classList.add('no-gl');
+  if (!state.gl) { hero.classList.add('no-gl'); $('#loaderLine').textContent = S().sealLabel; }
 
   state.booted = true;
   if (params.has('t')) {                       // ?t=3.2 freezes the opening at that second (for checking)
