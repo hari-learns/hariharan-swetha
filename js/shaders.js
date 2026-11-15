@@ -187,16 +187,16 @@ void main(){
   vec3 n = normalize(vec3(-amp * dhdc * gc, 1.0));
 
   float l = clamp(dot(n, uL) / uL.z, 0.0, 1.9);
-  vec3 lightC = vec3(0.996, 0.965, 0.905);
-  vec3 midC   = vec3(0.925, 0.850, 0.735);
-  vec3 darkC  = vec3(0.690, 0.575, 0.445);
+  vec3 lightC = vec3(0.860, 0.300, 0.300);      // rich maroon silk: deep wine in the folds, a warm red where it catches light
+  vec3 midC   = vec3(0.520, 0.075, 0.130);
+  vec3 darkC  = vec3(0.200, 0.018, 0.050);
   vec3 col = mix(darkC, midC, smoothstep(0.05, 0.98, l));
   col = mix(col, lightC, smoothstep(0.98, 1.6, l));
   col *= 0.84 + 0.16 * h;
 
   vec3 hv = normalize(uL + vec3(0.0, 0.0, 1.0));
   float ndh = max(dot(n, hv), 0.0);
-  col += pow(ndh, 22.0) * 0.13 + pow(ndh, 5.0) * 0.045;
+  col += (pow(ndh, 22.0) * 0.22 + pow(ndh, 5.0) * 0.05) * vec3(1.0, 0.72, 0.62);
 
   col *= mix(0.70, 1.0, smoothstep(0.0, uTopShade, vPx.y));
   gl_FragColor = vec4(col * a, a) * uFade;

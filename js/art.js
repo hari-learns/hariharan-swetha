@@ -358,6 +358,26 @@ function bananaTree(P, x, yBase, U, dir, R) {
   fan.forEach(([deg, L, droop, w], i) => {
     bananaLeaf(P, cxp, crownY + 3 * U, (dir * deg * Math.PI) / 180, L * U * (0.94 + R() * 0.12), droop, w * U, U, tones[i % 3]);
   });
+
+  // the bunch: a stalk that leans out from the crown, three hands of fruit, and the flower bud at its tip
+  const s0 = [cxp + dir * 3 * U, crownY + 8 * U], s1 = [cxp + dir * 17 * U, crownY + 14 * U], s2 = [cxp + dir * 21 * U, crownY + 50 * U];
+  const sp = (t) => {
+    const a = (1 - t) * (1 - t), b = 2 * (1 - t) * t, c = t * t;
+    return [a * s0[0] + b * s1[0] + c * s2[0], a * s0[1] + b * s1[1] + c * s2[1]];
+  };
+  P.line((c) => { c.moveTo(s0[0], s0[1]); c.quadraticCurveTo(s1[0], s1[1], s2[0], s2[1]); }, { w: 3 * U, top: 0.5, col: '#93a064', cw: 2.6 * U });
+  [[0.42, 5, '#c9c468'], [0.62, 5, '#d8c764'], [0.8, 4, '#e2ca62']].forEach(([t, n, tint]) => {
+    const [bx, by] = sp(t);
+    for (let j = 0; j < n; j++) {
+      const o = j - (n - 1) / 2, rot = Math.PI / 2 + o * 0.2 * dir;
+      const ex = bx + o * 3.3 * U, ey = by + (3.4 - Math.abs(o) * 0.5) * U, rx = 5.4 * U, ry = 1.9 * U;
+      P.shape((c) => { c.moveTo(ex + Math.cos(rot) * rx, ey + Math.sin(rot) * rx); c.ellipse(ex, ey, rx, ry, rot, 0, TAU); }, {
+        top: 0.62, edge: 0.44, bevel: 1.4 * U, col: tint, colEdge: 'rgba(110,96,30,0.6)', colBevel: 1.6 * U,
+      });
+    }
+  });
+  const [tx, ty] = sp(1);
+  leaf(P, tx, ty - 1 * U, 15 * U, 5.4 * U, Math.PI / 2 + dir * 0.12, { top: 0.66, edge: 0.44, bevel: 2 * U, col: '#8a2a43', colEdge: 'rgba(52,8,22,0.6)', colBevel: 2.2 * U });
 }
 
 function lotus(P, x, y, r, U) {
@@ -638,9 +658,10 @@ export function paintStageFront(W, H, k, gs) {
   const P = new Pair(W, fh);
   const R = rng(77);
   const cx = W / 2, flames = [];
-  const lampDx = Math.min(W / 2 - 34 * U, 152 * U);
-  lamp(P, cx - lampDx, fh - 27 * U, U, flames);
-  lamp(P, cx + lampDx, fh - 27 * U, U, flames);
+  // the diyas stand low and out at the edges, in front of the trunks, so the banana bunches hang clear
+  const lampDx = Math.min(W / 2 - 31 * U, 168 * U), LU = U * 0.74;
+  lamp(P, cx - lampDx, fh - 30 * U, LU, flames);
+  lamp(P, cx + lampDx, fh - 30 * U, LU, flames);
   bouquet(P, U, R, fh + 4 * U, 0);
   P.save(); P.translate(W, 0); P.scale(-1, 1);
   bouquet(P, U, R, fh + 4 * U, 1);

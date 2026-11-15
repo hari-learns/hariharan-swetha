@@ -46,10 +46,10 @@ window.INVITE = {
   },
 
   venue: {
-    name:    { en: "New Woodlands Hotel", ta: "நியூ உட்லண்ட்ஸ் ஹோட்டல்" },
+    name:    { en: "New Woodlands", ta: "நியூ உட்லண்ட்ஸ்" },
     address: { en: "72-75, Dr. Radhakrishnan Salai, Mylapore, Chennai 600004",
                ta: "72-75, டாக்டர் ராதாகிருஷ்ணன் சாலை, மயிலாப்பூர், சென்னை 600004" },
-    short:   { en: "Woodlands, RK Salai, Chennai", ta: "உட்லண்ட்ஸ், ஆர்.கே. சாலை, சென்னை" },
+    short:   { en: "New Woodlands, RK Salai, Chennai", ta: "நியூ உட்லண்ட்ஸ், ஆர்.கே. சாலை, சென்னை" },
     // Paste the Google Maps share link of the hall here. Left empty, the button searches for the name + address above.
     mapsUrl: "",
   },

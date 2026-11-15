@@ -81,7 +81,7 @@ function applyLang() {
 
   $('#venueName').textContent = L(C.venue.name);
   $('#venueAddr').textContent = L(C.venue.address);
-  $('#mapBtn').href = C.venue.mapsUrl || 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(`${C.venue.name.en}, ${C.venue.address.en}`);
+  $('#mapBtn').href = C.venue.mapsUrl || 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(`New Woodlands Hotel, ${C.venue.address.en}`);
 
   $('#footNames').textContent = `${gn} & ${bn}`;
   $('#footTag').textContent = C.couple.hashtag || '';
