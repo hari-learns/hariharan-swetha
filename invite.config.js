@@ -55,6 +55,9 @@ window.INVITE = {
   },
 
   rsvp: {
+    // The web-app link of the Google Sheet that collects replies (ends in /exec). With this set, a reply is
+    // saved straight to the sheet. Left empty, the reply opens WhatsApp instead.
+    sheetUrl: "",
     // WhatsApp number that receives the replies: country code + number, digits only, e.g. "919876543210".
     // Left empty, the guest's WhatsApp opens with the reply written and they pick your chat themselves.
     whatsapp: "",

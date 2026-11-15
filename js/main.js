@@ -187,7 +187,7 @@ function openInvite(instant = false) {
   state.opened = true;
   hero.classList.remove('is-closed');
   const quick = instant || reducedMotion();
-  if (C.sound !== false && !instant) { sound.prime(); startSound(true); }
+  if (C.sound !== false && !instant) { sound.startFile(); startSound(true); }   // the song starts inside the tap itself
   if (!quick) {
     const r = $('#seal').getBoundingClientRect();
     if (r.width) fx.dust(r.left + r.width / 2, r.top + r.height / 2, 36);
@@ -241,19 +241,36 @@ function initSections() {
   $('#gMinus').addEventListener('click', () => setGuests(state.guests - 1));
   $('#gPlus').addEventListener('click', () => setGuests(state.guests + 1));
   fName.addEventListener('input', () => { err.hidden = true; });
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const name = fName.value.trim();
-    if (!name) { err.hidden = false; fName.focus(); return; }
-    const s = S();
-    const when = fmtDate(C.wedding.start, state.lang, { day: 'numeric', month: 'long', year: 'numeric' });
-    const msg = s.waYes(name, state.guests, when);
-    const num = String((C.rsvp && C.rsvp.whatsapp) || '').replace(/\D/g, '');
-    const a = el('a', { href: `https://wa.me/${num}?text=${encodeURIComponent(msg)}`, target: '_blank', rel: 'noopener' });
-    document.body.append(a); a.click(); a.remove();
+  const showDone = () => {
     form.hidden = true; done.hidden = false;
     done.focus({ preventScroll: true });
     const c = column(); fx.rain(30, c.left, c.right); sound.play('sparkle');
+  };
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = fName.value.trim(), s = S();
+    err.textContent = s.fNeedName;
+    if (!name) { err.hidden = false; fName.focus(); return; }
+    const sheet = C.rsvp && C.rsvp.sheetUrl;
+    if (sheet) {
+      // straight into the couple's Google Sheet; the page cannot read the reply, only whether it left
+      const btn = form.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      try {
+        await fetch(sheet, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ name, guests: state.guests, lang: state.lang }) });
+        showDone();
+      } catch (e2) {
+        err.textContent = s.fFailed; err.hidden = false;
+      }
+      btn.disabled = false;
+      return;
+    }
+    const when = fmtDate(C.wedding.start, state.lang, { day: 'numeric', month: 'long', year: 'numeric' });
+    const num = String((C.rsvp && C.rsvp.whatsapp) || '').replace(/\D/g, '');
+    const a = el('a', { href: `https://wa.me/${num}?text=${encodeURIComponent(s.waYes(name, state.guests, when))}`, target: '_blank', rel: 'noopener' });
+    document.body.append(a); a.click(); a.remove();
+    showDone();
   });
   $('#rsvpAgain').addEventListener('click', () => { done.hidden = true; form.hidden = false; fName.focus(); });
 

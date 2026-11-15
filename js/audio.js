@@ -153,7 +153,7 @@ export class Sound {
   /* ── moments ── */
 
   play(name) {
-    if (!this.ctx || !this.on) return;
+    if (!this.ctx || !this.on || this.file) return;      // with the couple's own song, no chimes or effects on top
     const t = this.ctx.currentTime + 0.01;
     if (name === 'press') {
       this.thud(t, 0.32);
@@ -193,14 +193,16 @@ export class Sound {
     }).catch((err) => { this.el = null; console.warn('[sound] music file not playing, using the built-in melody:', err && err.name); this.melody(); });
   }
 
-  // Phones only let a page start a track from inside a tap. The music begins seconds after the tap,
-  // so the track is woken silently here, during the tap, and held until startMusic().
-  prime() {
+  // The couple's own track starts here, synchronously inside the tap, which is the only moment a phone allows it.
+  startFile() {
     if (!this.file || this.el) return;
     const a = new Audio(this.file);
     a.loop = true; a.volume = 0; a.preload = 'auto';
-    this.el = a;
-    a.play().then(() => { if (!this.musicOn) a.pause(); }).catch(() => { this.el = null; });
+    this.el = a; this.musicOn = true;
+    a.play().then(() => {
+      let v = 0;
+      const up = setInterval(() => { v = Math.min(0.75, v + 0.06); a.volume = v; if (v >= 0.75) clearInterval(up); }, 80);
+    }).catch((err) => { this.el = null; this.musicOn = false; console.warn('[sound] music file not playing:', err && err.name); });
   }
 
   melody() {
