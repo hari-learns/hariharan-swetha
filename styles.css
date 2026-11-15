@@ -348,7 +348,14 @@ textarea.field__input { resize: vertical; min-height: 96px; }
 .rsvp__done { max-width: 380px; margin: 24px auto 0; outline: none; animation: rise2 1s var(--ease) both; }
 
 /* footer */
-.foot { padding: clamp(30px, calc(var(--u) * 36), 60px) 24px calc(104px + env(safe-area-inset-bottom)); text-align: center; }
+.foot { position: relative; overflow: hidden; padding: clamp(30px, calc(var(--u) * 36), 60px) 24px calc(150px + env(safe-area-inset-bottom)); text-align: center; }
+/* the maroon silk comes back at the very end, three layers drifting past each other */
+.cloth { position: absolute; left: 0; right: 0; bottom: 0; height: calc(118px + env(safe-area-inset-bottom)); pointer-events: none; }
+.cloth__l { position: absolute; left: 0; bottom: 0; width: 200%; height: 100%; display: block; will-change: transform; animation: drift 14s linear infinite; }
+.cloth__l--a path { fill: #a3243a; } .cloth__l--a { animation-duration: 19s; }
+.cloth__l--b path { fill: #7a1229; } .cloth__l--b { animation-duration: 13s; animation-direction: reverse; }
+.cloth__l--c path { fill: #4a0818; } .cloth__l--c { animation-duration: 9s; }
+@keyframes drift { from { transform: translateX(0); } to { transform: translateX(-25%); } }
 .mono {
   --rx: 0deg; --ry: 0deg;
   display: block; width: min(calc(var(--u) * 250), 300px); margin: 0 auto 14px; padding: 0; border: 0; background: none; cursor: pointer;
@@ -403,5 +410,5 @@ html[lang="ta"] .count__cell span { font-size: 11px; }
   .name { -webkit-mask: none; mask: none; }
   .js .map .map__pin { opacity: 1; }
   .flame { animation: none; }
-  .mono img { animation: none; }
+  .mono img, .cloth__l { animation: none; }
 }
