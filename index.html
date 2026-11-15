@@ -33,7 +33,7 @@
 
 <div class="hud">
   <div class="hud__in">
-    <button class="hud__btn hud__sound" id="soundBtn" type="button" aria-pressed="false" aria-label="Music">
+    <button class="hud__btn hud__sound" id="soundBtn" type="button" aria-pressed="false" aria-label="Music" hidden>
       <svg width="22" height="22" aria-hidden="true"><use href="#i-sound"/></svg>
     </button>
     <button class="hud__btn hud__lang" id="langBtn" type="button" lang="ta">தமிழ்</button>
@@ -173,10 +173,17 @@
     </section>
 
     <footer class="foot">
-      <div class="mono rv" aria-hidden="true">
-        <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="54"/></svg>
-        <span id="monoText">H &amp; S</span>
-      </div>
+      <button class="mono rv" id="mono" type="button">
+        <svg viewBox="-112 -134 224 268" aria-hidden="true">
+          <path class="mono__card" id="monoCard" d=""/>
+          <g class="mono__beads" id="monoBeads"></g>
+          <g class="mono__sprig" transform="translate(0 -84)"><path d="M0 0c-5-9-5-19 0-28 5 9 5 19 0 28Z"/><path d="M-2 0c-9-3-15-10-17-19 9 2 16 9 17 19Z"/><path d="M2 0c9-3 15-10 17-19-9 2-16 9-17 19Z"/></g>
+          <g class="mono__sprig" transform="translate(0 86) scale(1 -1)"><path d="M0 0c-5-9-5-19 0-28 5 9 5 19 0 28Z"/><path d="M-2 0c-9-3-15-10-17-19 9 2 16 9 17 19Z"/><path d="M2 0c9-3 15-10 17-19-9 2-16 9-17 19Z"/></g>
+        </svg>
+        <span class="mono__txt" aria-hidden="true"><b id="monoA">H</b><i>&amp;</i><b id="monoB">S</b></span>
+        <span class="mono__date" id="monoDate" aria-hidden="true"></span>
+        <span class="vh" id="monoLabel">Hariharan and Swetha</span>
+      </button>
       <p class="foot__love rv" data-t="withLove">With love,</p>
       <p class="foot__names rv" id="footNames"></p>
       <p class="foot__tag rv" id="footTag"></p>

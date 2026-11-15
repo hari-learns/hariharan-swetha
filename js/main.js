@@ -14,7 +14,7 @@ const store = {
   get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
   set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* private mode */ } },
 };
-const startLang = C.languageSwitch ? (params.get('lang') || store.get('hs-lang') || C.startLanguage || 'en') : (C.startLanguage || 'en');
+const startLang = params.get('lang') || (C.languageSwitch && store.get('hs-lang')) || C.startLanguage || 'en';
 const state = {
   lang: STR[startLang] ? startLang : 'en',
   booted: false, wantOpen: false, opened: false, revealed: false, done: false, gl: false, painted: false, pending: null,
@@ -87,7 +87,10 @@ function applyLang() {
   $('#rsvpBy').textContent = C.rsvp && C.rsvp.by ? s.rsvpBy(fmtDate(C.rsvp.by + 'T12:00:00+05:30', lang, { day: 'numeric', month: 'long' })) : '';
   $('#footNames').textContent = `${gn} & ${bn}`;
   $('#footTag').textContent = C.couple.hashtag || '';
-  $('#monoText').textContent = C.couple.initials || '';
+  const ini = String(C.couple.initials || 'H & S').split('&').map((x) => x.trim());
+  $('#monoA').textContent = ini[0] || ''; $('#monoB').textContent = ini[1] || '';
+  $('#monoDate').textContent = fmtDate(C.wedding.start, 'en', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, ' · ');
+  $('#monoLabel').textContent = `${gn} & ${bn}`;
   blessLine();
 
   langBtn.hidden = !C.languageSwitch;
@@ -147,7 +150,7 @@ async function startSound(withPress) {
   if (!ok) return;
   soundBtn.setAttribute('aria-pressed', 'true');
   if (withPress) { sound.play('press'); setTimeout(() => sound.play('doors'), 240); }
-  if (state.revealed) sound.startMusic();
+  if (state.opened) sound.startMusic();          // the music comes in with the tap, under the doors
 }
 
 function beat(name) {
@@ -244,6 +247,41 @@ function initSections() {
     try { await navigator.clipboard.writeText(url); $('#copied').textContent = S().copied; }
     catch (e) { $('#copied').textContent = url; }
   });
+
+  // the seal at the end: the card that opened the invitation comes back with their initials
+  const mono = $('#mono'), pts = [];
+  let d = '';
+  for (let i = 0; i <= 360; i++) {
+    const th = (i / 360) * Math.PI * 2 - Math.PI / 2;
+    const r = 1 + 0.05 * Math.pow(Math.abs(Math.sin(th * 7)), 0.72) + 0.034 * Math.cos(4 * th);
+    d += (i ? 'L' : 'M') + (Math.cos(th) * 96 * r).toFixed(1) + ' ' + (Math.sin(th) * 118 * r).toFixed(1);
+    const q = 0.87 * (1 + 0.034 * Math.cos(4 * th));
+    pts.push([Math.cos(th) * 96 * q, Math.sin(th) * 118 * q]);
+  }
+  $('#monoCard').setAttribute('d', d + 'Z');
+  const beads = $('#monoBeads');
+  let acc = 0, n = 0;
+  for (let i = 1; i < pts.length; i++) {
+    acc += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+    if (acc < 9.6) continue;
+    acc = 0;
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    c.setAttribute('cx', pts[i][0].toFixed(1)); c.setAttribute('cy', pts[i][1].toFixed(1)); c.setAttribute('r', '2.6');
+    c.style.animationDelay = (n++ * 0.07).toFixed(2) + 's';
+    beads.append(c);
+  }
+  mono.addEventListener('click', () => {
+    const r = mono.getBoundingClientRect();
+    fx.burst(r.left + r.width / 2, r.top + r.height / 2, 60, 1.2);
+    sound.play('sparkle');
+    mono.classList.remove('is-pop'); void mono.offsetWidth; mono.classList.add('is-pop');
+  });
+  mono.addEventListener('pointermove', (e) => {
+    const r = mono.getBoundingClientRect();
+    mono.style.setProperty('--rx', (((e.clientY - r.top) / r.height - 0.5) * -14).toFixed(1) + 'deg');
+    mono.style.setProperty('--ry', (((e.clientX - r.left) / r.width - 0.5) * 16).toFixed(1) + 'deg');
+  });
+  mono.addEventListener('pointerleave', () => { mono.style.setProperty('--rx', '0deg'); mono.style.setProperty('--ry', '0deg'); });
 
   sweep = initReveals();
 }

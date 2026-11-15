@@ -10,8 +10,8 @@
 window.INVITE = {
   draft: true,                 // true shows a small "sample details" tag on the page
   startLanguage: "en",         // "en" or "ta"
-  languageSwitch: true,        // true shows the English / தமிழ் button at the bottom left
-  sound: true,                 // music starts when the guest taps the seal (they can mute it)
+  languageSwitch: false,       // each language has its own link: add ?lang=ta or ?lang=en. true also shows a switch button
+  sound: true,                 // music starts when the guest taps the seal
 
   couple: {
     groom: {
