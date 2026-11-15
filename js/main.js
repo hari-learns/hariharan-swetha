@@ -86,6 +86,7 @@ function applyLang() {
 
   $('#footNames').textContent = `${gn} & ${bn}`;
   $('#footTag').textContent = C.couple.hashtag || '';
+  $('#footTag').hidden = !C.couple.hashtag;
   $('#monoLabel').textContent = lang === 'ta' ? 'விநாயகர்' : 'Lord Ganesha';
   blessLine();
   const mc = C.musicFile && C.musicCredit;

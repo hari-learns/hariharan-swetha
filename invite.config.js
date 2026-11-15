@@ -30,7 +30,7 @@ window.INVITE = {
                  ta: "திரு. கல்யாண் கிருஷ்ணன் – திருமதி. சாந்தி தம்பதியரின் புதல்வி" }, // check the Tamil spelling
     },
     initials: "H & S",
-    hashtag: "#HariWedsSwetha",                                                      // SAMPLE
+    hashtag: "",                      // leave empty for no hashtag
   },
 
   // The day on the invitation: the reception at Woodlands. Add the time when it is fixed and set showTime: true.
