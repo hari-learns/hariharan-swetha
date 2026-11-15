@@ -59,6 +59,15 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .newtask input, .newtask select { min-width: 0; min-height: 46px; padding: 0 12px; border: 0; background: var(--card); color: var(--ink); font: inherit; }
 .newtask button { min-height: 46px; padding: 0 18px; border: 0; background: var(--sage); color: var(--bg); font: inherit; font-weight: 700; cursor: pointer; }
 @media (max-width: 560px) { .newtask__row { grid-template-columns: minmax(0, 1fr) auto; } .newtask input { grid-column: 1 / -1; } }
+.who { margin-top: 44px; }
+.who h2 { font-family: var(--display); font-weight: 700; font-size: 1.75rem; line-height: 1.15; margin: 0; }
+.who__hint { margin: 6px 0 12px; color: var(--soft); }
+.who__form { display: grid; grid-template-columns: minmax(0, 1fr) 84px auto; gap: 8px; }
+.who__form input { min-width: 0; min-height: 46px; padding: 0 12px; border: 0; background: var(--card); color: var(--ink); font: inherit; }
+.who__form button { min-height: 46px; padding: 0 18px; border: 0; background: var(--sage); color: var(--bg); font: inherit; font-weight: 700; cursor: pointer; }
+.guest { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 12px; background: var(--card); padding: 10px 14px; }
+.guest__name { font-weight: 600; overflow-wrap: anywhere; }
+.guest__n { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--gold); }
 .state { margin-top: 26px; background: var(--card); padding: 18px; }
 .state h2 { font-family: var(--display); font-size: 1.5rem; margin: 0 0 6px; }
 .src { margin-top: 44px; color: var(--soft); font-size: 14px; }
@@ -106,6 +115,20 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   </div>
 
   <main id="phases"></main>
+
+  <section class="who" id="who" hidden aria-labelledby="whoTitle">
+    <div class="phase__head">
+      <h2 id="whoTitle">Who's in</h2>
+      <span class="phase__left" id="whoTotal" aria-live="polite"></span>
+    </div>
+    <p class="who__hint">When someone says they are coming, add their name and how many are coming with them.</p>
+    <form class="who__form" id="whoForm">
+      <input id="whoName" type="text" maxlength="80" placeholder="Name" aria-label="Name" autocomplete="off">
+      <input id="whoCount" type="number" min="1" max="30" value="2" inputmode="numeric" aria-label="How many people">
+      <button type="submit">Add</button>
+    </form>
+    <ul class="list" id="whoList"></ul>
+  </section>
 
   <section class="src" aria-labelledby="srcTitle">
     <h2 id="srcTitle">Where the facts came from</h2>
@@ -249,6 +272,37 @@ async function start() {
   const user = await window.claude.use('user');
   if (user) { const can = await user.can('data.write'); if (can === false) canWrite = false; }
   col = db.collection('tasks');
+  // who has said yes
+  const gcol = db.collection('guests'), who = $('#who'), wl = $('#whoList');
+  who.hidden = false; $('#whoForm').hidden = !canWrite;
+  gcol.onSnapshot((snap) => {
+    const rows = snap.docs.map((d) => Object.assign({ id: d.id }, d.data())).sort((a, b) => (a.at || 0) - (b.at || 0));
+    wl.textContent = '';
+    let total = 0;
+    rows.forEach((g) => {
+      const n = Math.max(1, +g.n || 1); total += n;
+      const li = el('li', 'guest');
+      li.append(el('span', 'guest__name', g.name || ''), el('span', 'guest__n', n === 1 ? '1 person' : n + ' people'));
+      if (canWrite) {
+        const rm = el('button', 'linkbtn is-danger', 'Remove'); rm.type = 'button';
+        let armed = false;
+        rm.addEventListener('click', () => {
+          if (!armed) { armed = true; rm.textContent = 'Tap again'; setTimeout(() => { armed = false; rm.textContent = 'Remove'; }, 3500); return; }
+          gcol.doc(g.id).delete().catch(() => { rm.textContent = 'Could not remove'; });
+        });
+        li.append(rm);
+      }
+      wl.append(li);
+    });
+    $('#whoTotal').textContent = rows.length ? `${total} people from ${rows.length} ${rows.length === 1 ? 'reply' : 'replies'}` : 'No replies yet';
+  }, () => { $('#whoTotal').textContent = 'Could not load'; });
+  $('#whoForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const nm = $('#whoName'), v = nm.value.trim(); if (!v) { nm.focus(); return; }
+    const n = Math.min(30, Math.max(1, parseInt($('#whoCount').value, 10) || 1));
+    nm.value = '';
+    gcol.add({ name: v, n, at: Date.now() }).catch(() => { nm.value = v; });
+  });
   if (canWrite) {
     const form = $('#newTask'), sel = $('#newPhase'), inp = $('#newText');
     PHASES.forEach(([name], i) => { const o = el('option', '', name); o.value = i; sel.append(o); });
