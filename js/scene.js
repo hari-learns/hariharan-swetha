@@ -26,6 +26,8 @@ export class Scene {
     this.stageReady = false; this.stageToken = 0; this.frontFade = 0;
     this.pts = new Float32Array(7 * 2400);
     this.frontOff = [0, 0];
+    this.rs = 1; this.slow = 0; this.slowN = 0; this.drops = 0; this.lastTick = 0;
+    this.lite = (typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches) || window.innerWidth <= 820;
   }
 
   /* ── setup ── */
@@ -40,7 +42,7 @@ export class Scene {
     this.gl = gl;
     const hp = gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.HIGH_FLOAT);
     const prec = hp && hp.precision > 0 ? 'highp' : 'mediump';
-    this.pRelief = this.prog(VERT, RELIEF_FRAG(prec), ['aPos', 'aUv']);
+    this.pRelief = this.prog(VERT, RELIEF_FRAG(prec, this.lite ? 6 : 10), ['aPos', 'aUv']);
     this.pFabric = this.prog(VERT, FABRIC_FRAG(prec), ['aPos', 'aUv']);
     this.pPoint = this.prog(POINT_VERT, POINT_FRAG, ['aP', 'aC']);
     this.pFlat = this.prog(VERT, FLAT_FRAG, ['aPos', 'aUv']);
@@ -96,13 +98,15 @@ export class Scene {
   build() {
     const r = this.canvas.getBoundingClientRect();
     const cssW = Math.max(1, Math.round(r.width)), cssH = Math.max(1, Math.round(r.height));
-    let dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const budget = 2.7e6;
+    // phones get a lighter canvas: the artwork is soft relief, so it holds up, and the frame rate matters more
+    const weak = this.lite && navigator.deviceMemory && navigator.deviceMemory <= 4;
+    let dpr = Math.min(window.devicePixelRatio || 1, weak ? 1.3 : this.lite ? 1.6 : 2);
+    const budget = this.lite ? 1.5e6 : 2.4e6;
     if (cssW * cssH * dpr * dpr > budget) dpr = Math.sqrt(budget / (cssW * cssH));
     if (cssH * dpr > this.maxTex) dpr = this.maxTex / cssH;
     this.cssW = cssW; this.cssH = cssH; this.dpr = dpr;
     const W = (this.W = Math.round(cssW * dpr)), H = (this.H = Math.round(cssH * dpr));
-    this.canvas.width = W; this.canvas.height = H;
+    this.canvas.width = Math.round(W * this.rs); this.canvas.height = Math.round(H * this.rs);
     const k = (this.k = W / 390);
     this.gs = clamp(H / W / 1.72, 0.9, 1.28);
     const gardenTop = H - 292 * k * this.gs;
@@ -405,6 +409,7 @@ export class Scene {
     gl.uniform2f(P.u.uRes, this.W, this.H);
     gl.uniform3f(P.u.uL, L[0], L[1], L[2]);
     gl.uniform1f(P.u.uFade, 1);
+    gl.uniform1f(P.u.uPx, this.rs);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.ptBuf);
     gl.bufferData(gl.ARRAY_BUFFER, this.pts.subarray(0, this.np * 7), gl.DYNAMIC_DRAW);
     gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 28, 0);
@@ -420,7 +425,7 @@ export class Scene {
     const gl = this.gl;
     if (!gl || gl.isContextLost()) return;
     const { W, H, k, s } = this;
-    gl.viewport(0, 0, W, H);
+    gl.viewport(0, 0, this.canvas.width, this.canvas.height);
     gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
     const px = this.ptrS[0], py = this.ptrS[1];
     const L = norm([-0.52 + 0.36 * px, -0.6 + 0.28 * py, 0.62]);
@@ -449,6 +454,7 @@ export class Scene {
       gl.uniform3f(u.uL, L[0], L[1], L[2]);
       gl.uniform1f(u.uTime, this.time);
       gl.uniform1f(u.uFade, 1);
+      gl.uniform1f(u.uPx, this.rs);
       // curtains
       gl.uniform2f(u.uAxis, 1, 0);
       gl.uniform1f(u.uN, Math.max(5, Math.round(W / 2 / k / 27)));
@@ -467,6 +473,7 @@ export class Scene {
       this.drawPoints(L, par);
       // valance
       gl.useProgram(P.p);
+      gl.uniform1f(u.uPx, this.rs);
       gl.uniform2f(u.uAxis, 0, 1);
       gl.uniform1f(u.uN, 3.4);
       gl.uniform1f(u.uAmp, 7.5 * k);
@@ -535,6 +542,18 @@ export class Scene {
     const tick = (now) => {
       this.raf = requestAnimationFrame(tick);
       this.frame++;
+      // If the phone cannot keep up, draw the scene smaller (the page stretches it back). Up to three steps down.
+      const gap = now - this.lastTick; this.lastTick = now;
+      if (gap > 0 && gap < 250) {
+        this.slow += gap; this.slowN++;
+        if (this.slowN >= 30) {
+          if (this.slow / this.slowN > 25 && this.drops < 3) {
+            this.drops++; this.rs = Math.max(0.5, this.rs * 0.78);
+            this.canvas.width = Math.round(this.W * this.rs); this.canvas.height = Math.round(this.H * this.rs);
+          }
+          this.slow = 0; this.slowN = 0;
+        }
+      }
       const busy = this.T != null && this.T < BEATS.done + 1;
       if (!busy && this.frame % 2) return;     // ambient life runs at half rate
       this.update(now); this.draw();

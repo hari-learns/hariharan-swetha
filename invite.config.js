@@ -16,7 +16,7 @@ window.INVITE = {
   // If the file is missing the built-in melody plays.
   musicFile: "music.mp3",
   // shown at the very end of the page as:  Music: <title> by <by>  (the title links to url)
-  musicCredit: { title: "South Indian Instrument Music", by: "dhevigavalampuri", url: "https://pixabay.com/music/india-south-indian-instrument-music-433586/" },
+  musicCredit: { title: "Rangapura Vihara", by: "Agam", url: "https://www.youtube.com/watch?v=T9p_lQ0oT4s" },
 
   couple: {
     groom: {

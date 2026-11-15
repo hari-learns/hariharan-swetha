@@ -180,7 +180,7 @@ html[lang="ta"] .name, html[lang="ta"] .sec__title, html[lang="ta"] .foot__names
   background: linear-gradient(var(--paper-lo), var(--paper) 150px) var(--paper);
   box-shadow: 0 30px 70px rgba(26, 38, 16, .45);
 }
-.sheet::after { content: ""; position: absolute; inset: 0; pointer-events: none; background-image: var(--paper-tile, none); background-size: 220px 220px; opacity: .55; mix-blend-mode: multiply; }
+.sheet::after { content: ""; position: absolute; inset: 0; pointer-events: none; background-image: var(--paper-tile, none); background-size: 220px 220px; opacity: .5; }
 .sheet > * { position: relative; z-index: 1; }
 .sheet::before {
   content: ""; position: absolute; left: 0; right: 0; top: -5px; height: 10px; z-index: 2;

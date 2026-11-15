@@ -18,7 +18,7 @@ void main(){
 // A height map lit like sculpted paper: slope shading, a marched cast shadow, contact shadow, paper grain.
 // uH: r = height, (g - r) = mask A (plaque on the door, water on the stage), (b - r) = mask B (gold).
 // uA: colour, premultiplied alpha (only the front layer has transparency).
-export const RELIEF_FRAG = (prec) => `
+export const RELIEF_FRAG = (prec, steps = 10) => `
 precision ${prec} float;
 varying vec2 vUv;
 uniform sampler2D uH;
@@ -93,8 +93,8 @@ void main(){
   vec2 ldir = normalize(uL.xy);
   float slope = uL.z / max(length(uL.xy), 0.001);
   float sh = 0.0;
-  for (int i = 1; i <= 10; i++) {
-    float f = float(i) / 10.0;
+  for (int i = 1; i <= ${steps}; i++) {
+    float f = float(i) / ${steps}.0;
     float d = f * f * uShLen;
     float hi = hs(uv + ldir * d * uTexel);
     float ray = h0 + d * slope / uHScale;
@@ -155,6 +155,7 @@ uniform float uWave;
 uniform float uSeed;
 uniform float uTopShade;
 uniform float uFade;
+uniform float uPx;      // real pixels per art pixel (below 1 when the scene is drawn smaller to stay smooth)
 
 float pleatH(float c, float o){
   float w = c + 0.026 * sin(c * 11.0 + 1.3 + uSeed) + 0.012 * sin(c * 29.0 + o * 2.2 + uSeed * 2.0)
@@ -180,7 +181,7 @@ void main(){
   float eps = 0.0012;
   float h = pleatH(c, o);
   float dhdc = (pleatH(c + eps, o) - pleatH(c - eps, o)) / (2.0 * eps);
-  vec2 gc = vec2(dFdx(c), dFdy(c));
+  vec2 gc = vec2(dFdx(c), dFdy(c)) * uPx;
   float comp = max(length(gc) / uDu0, 0.4);
   float amp = uAmp * pow(comp, -0.6);
   vec3 n = normalize(vec3(-amp * dhdc * gc, 1.0));
@@ -207,11 +208,12 @@ attribute vec3 aP;
 attribute vec4 aC;
 uniform vec2 uRes;
 uniform vec2 uOff;
+uniform float uPx;
 varying vec4 vC;
 void main(){
   vec2 p = (aP.xy + uOff) / uRes;
   gl_Position = vec4(p.x * 2.0 - 1.0, 1.0 - p.y * 2.0, 0.0, 1.0);
-  gl_PointSize = aP.z;
+  gl_PointSize = aP.z * uPx;
   vC = aC;
 }`;
 

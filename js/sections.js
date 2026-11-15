@@ -20,7 +20,7 @@ export class FX {
     addEventListener('resize', () => this.resize());
   }
   resize() {
-    const d = (this.d = Math.min(window.devicePixelRatio || 1, 2));
+    const d = (this.d = Math.min(window.devicePixelRatio || 1, window.innerWidth <= 820 ? 1.5 : 2));
     this.w = window.innerWidth; this.h = window.innerHeight;
     this.c.width = Math.round(this.w * d); this.c.height = Math.round(this.h * d);
   }
