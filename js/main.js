@@ -87,10 +87,7 @@ function applyLang() {
   $('#rsvpBy').textContent = C.rsvp && C.rsvp.by ? s.rsvpBy(fmtDate(C.rsvp.by + 'T12:00:00+05:30', lang, { day: 'numeric', month: 'long' })) : '';
   $('#footNames').textContent = `${gn} & ${bn}`;
   $('#footTag').textContent = C.couple.hashtag || '';
-  const ini = String(C.couple.initials || 'H & S').split('&').map((x) => x.trim());
-  $('#monoA').textContent = ini[0] || ''; $('#monoB').textContent = ini[1] || '';
-  $('#monoDate').textContent = fmtDate(C.wedding.start, 'en', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, ' · ');
-  $('#monoLabel').textContent = `${gn} & ${bn}`;
+  $('#monoLabel').textContent = lang === 'ta' ? 'விநாயகர்' : 'Lord Ganesha';
   blessLine();
 
   langBtn.hidden = !C.languageSwitch;
