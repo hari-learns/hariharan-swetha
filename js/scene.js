@@ -169,11 +169,14 @@ export class Scene {
     this.clothTau = -1;
     // the valance: three swags across the top, the middle one in front
     const cap = Math.min(1, H / (1.6 * W));
+    // the three swags meet exactly under the two rosettes, pinched to the same height, so the cloth reads as one piece
+    const dEnd = 0.036 * W * cap;
     const defs = [
-      { x0: -0.12 * W, x1: 0.3 * W, dMid: 0.165 * W * cap, dEnd: 0.05 * W * cap, seed: 2.0 },
-      { x0: 0.7 * W, x1: 1.12 * W, dMid: 0.165 * W * cap, dEnd: 0.05 * W * cap, seed: 5.0 },
-      { x0: 0.2 * W, x1: 0.8 * W, dMid: 0.19 * W * cap, dEnd: 0.05 * W * cap, seed: 8.0 },
+      { x0: -0.12 * W, x1: 0.25 * W, dMid: 0.165 * W * cap, dEnd, seed: 2.0 },
+      { x0: 0.75 * W, x1: 1.12 * W, dMid: 0.165 * W * cap, dEnd, seed: 5.0 },
+      { x0: 0.25 * W, x1: 0.75 * W, dMid: 0.19 * W * cap, dEnd, seed: 8.0 },
     ];
+
     if (!this.swags) this.swags = defs.map(() => this.grid(40, 16));
     this.swagEdge = [];
     defs.forEach((d, si) => {
@@ -190,7 +193,7 @@ export class Scene {
       for (let i = 0; i <= 80; i++) { const a = i / 80; edge.push([d.x0 + a * (d.x1 - d.x0), depth(a)]); }
       this.swagEdge.push(edge);
     });
-    this.rosettes = [[0.25 * W, 0.05 * W * cap + 3 * k], [0.75 * W, 0.05 * W * cap + 3 * k]];
+    this.rosettes = [[0.25 * W, dEnd * 0.62], [0.75 * W, dEnd * 0.62]];
   }
 
   /* ── cloth ── */

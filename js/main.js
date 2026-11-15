@@ -84,7 +84,6 @@ function applyLang() {
   $('#venueAddr').textContent = L(C.venue.address);
   $('#mapBtn').href = C.venue.mapsUrl || 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(`${C.venue.name.en}, ${C.venue.address.en}`);
 
-  $('#rsvpBy').textContent = C.rsvp && C.rsvp.by ? s.rsvpBy(fmtDate(C.rsvp.by + 'T12:00:00+05:30', lang, { day: 'numeric', month: 'long' })) : '';
   $('#footNames').textContent = `${gn} & ${bn}`;
   $('#footTag').textContent = C.couple.hashtag || '';
   $('#monoLabel').textContent = lang === 'ta' ? 'விநாயகர்' : 'Lord Ganesha';
@@ -246,27 +245,7 @@ function initSections() {
   });
 
   // the seal at the end: the card that opened the invitation comes back with their initials
-  const mono = $('#mono'), pts = [];
-  let d = '';
-  for (let i = 0; i <= 360; i++) {
-    const th = (i / 360) * Math.PI * 2 - Math.PI / 2;
-    const r = 1 + 0.05 * Math.pow(Math.abs(Math.sin(th * 7)), 0.72) + 0.034 * Math.cos(4 * th);
-    d += (i ? 'L' : 'M') + (Math.cos(th) * 96 * r).toFixed(1) + ' ' + (Math.sin(th) * 118 * r).toFixed(1);
-    const q = 0.87 * (1 + 0.034 * Math.cos(4 * th));
-    pts.push([Math.cos(th) * 96 * q, Math.sin(th) * 118 * q]);
-  }
-  $('#monoCard').setAttribute('d', d + 'Z');
-  const beads = $('#monoBeads');
-  let acc = 0, n = 0;
-  for (let i = 1; i < pts.length; i++) {
-    acc += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
-    if (acc < 9.6) continue;
-    acc = 0;
-    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    c.setAttribute('cx', pts[i][0].toFixed(1)); c.setAttribute('cy', pts[i][1].toFixed(1)); c.setAttribute('r', '2.6');
-    c.style.animationDelay = (n++ * 0.07).toFixed(2) + 's';
-    beads.append(c);
-  }
+  const mono = $('#mono');
   mono.addEventListener('click', () => {
     const r = mono.getBoundingClientRect();
     fx.burst(r.left + r.width / 2, r.top + r.height / 2, 60, 1.2);
