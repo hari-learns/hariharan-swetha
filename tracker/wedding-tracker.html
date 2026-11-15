@@ -1,0 +1,251 @@
+<title>Hari & Swetha Wedding Tracker</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one narrow column; a sticky progress bar, then the to-dos grouped by when they fall due. */
+:root {
+  --bg: #f1e6cf; --card: #fbf5e6; --ink: #232c1b; --soft: #4c573f; --sage: #36472a; --sage-fill: #dfe6cc;
+  --gold: #8a6a22; --dot: #b8944a; --done: #6c7660; --alert: #9a3a2c; --field: #ffffff;
+  --display: "Cormorant Garamond", Georgia, serif; --text: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #1b2116; --card: #262e1f; --ink: #f1ead8; --soft: #c3c9b4; --sage: #b9cc98; --sage-fill: #36432a;
+  --gold: #e0c688; --dot: #d1b06a; --done: #8f9982; --alert: #f0a091; --field: #1b2116; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #1b2116; --card: #262e1f; --ink: #f1ead8; --soft: #c3c9b4; --sage: #b9cc98; --sage-fill: #36432a;
+  --gold: #e0c688; --dot: #d1b06a; --done: #8f9982; --alert: #f0a091; --field: #1b2116; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--text); font-size: 16px; line-height: 1.5; }
+.wrap { max-width: 720px; margin: 0 auto; padding-block: 28px 80px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2rem, 1.3rem + 3.4vw, 3rem); line-height: 1.05; margin: 0; text-wrap: balance; }
+.sub { margin: 8px 0 0; color: var(--soft); max-width: 60ch; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 0; padding: 0; list-style: none; }
+.facts li { background: var(--sage-fill); padding: 7px 11px; font-weight: 600; font-size: 14px; }
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 14px 12px; margin-top: 18px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.bar__row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.bar__count { font-weight: 700; font-variant-numeric: tabular-nums; }
+.track { height: 10px; background: var(--sage-fill); margin-top: 10px; }
+.track i { display: block; height: 100%; width: 0; background: var(--sage); transition: width .5s ease; }
+.filters { display: flex; gap: 6px; }
+.filters button { font: inherit; font-weight: 600; font-size: 14px; min-height: 40px; padding: 0 14px; border: 0; background: var(--sage-fill); color: var(--ink); cursor: pointer; }
+.filters button[aria-pressed="true"] { background: var(--sage); color: var(--bg); }
+.phase { margin-top: 30px; }
+.phase__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; }
+.phase h2 { font-family: var(--display); font-weight: 700; font-size: 1.75rem; line-height: 1.15; margin: 0; }
+.phase__when { color: var(--gold); font-weight: 700; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+.phase__left { margin-left: auto; color: var(--soft); font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.list { display: grid; gap: 8px; margin: 12px 0 0; padding: 0; list-style: none; }
+.task { background: var(--card); padding: 12px 14px; min-width: 0; }
+.task__top { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px; align-items: start; }
+.task input[type="checkbox"] { width: 26px; height: 26px; margin: 1px 0 0; accent-color: var(--sage); cursor: pointer; }
+.task__title { font-weight: 600; display: block; cursor: pointer; }
+.task__hint { display: block; margin-top: 3px; color: var(--soft); font-size: 14.5px; overflow-wrap: anywhere; }
+.task.is-done .task__title { color: var(--done); text-decoration: line-through; text-decoration-thickness: 2px; }
+.task.is-done .task__hint { display: none; }
+.task__note { margin: 10px 0 0 42px; }
+.task__note textarea { display: block; width: 100%; min-height: 44px; padding: 9px 10px; border: 0; background: var(--field); color: var(--ink); font: inherit; font-size: 15px; resize: vertical; box-shadow: inset 0 0 0 2px var(--sage-fill); }
+.task__note textarea:focus-visible, .add input:focus-visible { outline: 3px solid var(--sage); outline-offset: 0; }
+.task__meta { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 8px 0 0 42px; }
+.linkbtn { font: inherit; font-size: 14px; font-weight: 600; min-height: 40px; padding: 0 2px; border: 0; background: none; color: var(--sage); cursor: pointer; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.linkbtn.is-danger { color: var(--alert); }
+.saved { font-size: 13px; color: var(--soft); align-self: center; }
+.add { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; margin-top: 8px; }
+.add input { min-width: 0; min-height: 44px; padding: 0 12px; border: 0; background: var(--card); color: var(--ink); font: inherit; }
+.add button, .primary { min-height: 44px; padding: 0 16px; border: 0; background: var(--sage); color: var(--bg); font: inherit; font-weight: 700; cursor: pointer; }
+.state { margin-top: 26px; background: var(--card); padding: 18px; }
+.state h2 { font-family: var(--display); font-size: 1.5rem; margin: 0 0 6px; }
+.src { margin-top: 44px; color: var(--soft); font-size: 14px; }
+.src h2 { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); margin: 0 0 8px; }
+.src ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.src a { color: var(--sage); overflow-wrap: anywhere; }
+@media (prefers-reduced-motion: reduce) { .track i { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Hari &amp; Swetha: wedding to-do list</h1>
+    <p class="sub">Temple wedding in the morning, reception on the lawn at New Woodlands. Tick things off and leave a note; everyone with this page sees it at once.</p>
+    <ul class="facts">
+      <li>Thursday, 11 February 2027</li>
+      <li id="daysLeft"></li>
+      <li>New Woodlands, RK Salai</li>
+    </ul>
+  </header>
+
+  <div class="bar" id="bar" hidden>
+    <div class="bar__row">
+      <span class="bar__count" id="count" aria-live="polite"></span>
+      <div class="filters" role="group" aria-label="Show">
+        <button type="button" data-f="all" aria-pressed="true">All</button>
+        <button type="button" data-f="open" aria-pressed="false">To do</button>
+        <button type="button" data-f="done" aria-pressed="false">Done</button>
+      </div>
+    </div>
+    <div class="track" aria-hidden="true"><i id="fill"></i></div>
+  </div>
+
+  <div class="state" id="state">
+    <h2 id="stateTitle">Opening the list…</h2>
+    <p id="stateText">The to-dos are kept in one shared place so everyone sees the same ticks and notes.</p>
+  </div>
+
+  <main id="phases"></main>
+
+  <section class="src" aria-labelledby="srcTitle">
+    <h2 id="srcTitle">Where the facts came from</h2>
+    <ul>
+      <li>Temple paperwork (ID, address proof, Aadhaar, unmarried certificate from an e-Sevai centre): <a href="https://www.thehindu.com/news/cities/chennai/hrce-makes-changes-in-certificates-to-be-submitted-for-weddings-in-temples/article65667611.ece">The Hindu, July 2022</a></li>
+      <li>Registration within 90 days, signed by the couple, priest and two witnesses: <a href="https://velvetknot.in/marriage-registration-tamil-nadu">Velvet Knot guide to the Tamil Nadu Act</a></li>
+      <li>Woodlands lawn, halls, rates and terms (listing figures, confirm with the hotel): <a href="https://chennai.wedding.net/venues/416023/">wedding.net</a>, <a href="https://weddingz.in/chennai/new-woodlands-hotel-mylapore">Weddingz</a></li>
+      <li>Order of bookings for a Tamil wedding: <a href="https://www.planme.club/articles/tamil-wedding-planning">PlanMe</a>, <a href="https://trendyootech.in/blog/tamil-wedding-planning-checklist-timeline">Trendyoo</a></li>
+      <li>Open-air loudspeakers off between 10 PM and 6 AM: <a href="https://spiritofchennai.com/noise-pollution-chennai-decibel-limits-complaint">Spirit of Chennai</a></li>
+    </ul>
+  </section>
+</div>
+
+<script>
+const PHASES = [
+  ['This week', 'by 22 November'], ['Rest of November', 'by 30 November'], ['December', ''], ['January', ''],
+  ['Last two weeks', '28 January to 8 February'], ['Wedding week', '9 to 11 February'], ['After the wedding', ''],
+];
+const WEDDING = new Date('2027-02-11T00:00:00+05:30');
+const $ = (s, r = document) => r.querySelector(s);
+const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
+
+let tasks = [], filter = 'all', canWrite = true, col = null;
+const open = new Set(), timers = new Map(), nodes = new Map();
+
+(function days() {
+  const d = Math.ceil((WEDDING - Date.now()) / 86400000);
+  $('#daysLeft').textContent = d > 1 ? d + ' days to go' : d === 1 ? 'Tomorrow' : d === 0 ? 'Today' : 'Married';
+})();
+
+function showState(title, text) { $('#state').hidden = false; $('#stateTitle').textContent = title; $('#stateText').textContent = text; }
+
+function saveNote(t, value, status) {
+  clearTimeout(timers.get(t.id));
+  timers.set(t.id, setTimeout(() => {
+    status.textContent = 'Saving…';
+    col.doc(t.id).update({ note: value }).then(() => { status.textContent = 'Saved'; }, () => { status.textContent = 'Could not save. Check your connection.'; });
+  }, 700));
+}
+
+function taskNode(t) {
+  const li = el('li', 'task'); li.dataset.id = t.id;
+  const top = el('div', 'task__top');
+  const cb = el('input'); cb.type = 'checkbox'; cb.id = 'c-' + t.id; cb.disabled = !canWrite;
+  const lab = el('label'); lab.htmlFor = cb.id;
+  const title = el('span', 'task__title'), hint = el('span', 'task__hint');
+  lab.append(title, hint); top.append(cb, lab);
+  const noteBox = el('div', 'task__note');
+  const ta = el('textarea'); ta.id = 'n-' + t.id; ta.rows = 2; ta.placeholder = 'Who is doing it, phone numbers, prices, what was agreed'; ta.setAttribute('aria-label', 'Note');
+  ta.readOnly = !canWrite; noteBox.append(ta);
+  const meta = el('div', 'task__meta');
+  const noteBtn = el('button', 'linkbtn'); noteBtn.type = 'button';
+  const del = el('button', 'linkbtn is-danger', 'Remove'); del.type = 'button';
+  const status = el('span', 'saved');
+  meta.append(noteBtn, del, status);
+  li.append(top, noteBox, meta);
+
+  cb.addEventListener('change', () => { col.doc(t.id).update({ done: cb.checked }).catch(() => { cb.checked = !cb.checked; status.textContent = 'Could not save.'; }); });
+  ta.addEventListener('input', () => saveNote(nodes.get(t.id).task, ta.value, status));
+  noteBtn.addEventListener('click', () => { open.has(t.id) ? open.delete(t.id) : open.add(t.id); paintTask(t.id); if (open.has(t.id)) ta.focus(); });
+  let armed = false;
+  del.addEventListener('click', () => {
+    if (!armed) { armed = true; del.textContent = 'Tap again to remove'; setTimeout(() => { armed = false; del.textContent = 'Remove'; }, 3500); return; }
+    col.doc(t.id).delete().catch(() => { status.textContent = 'Could not remove.'; });
+  });
+  nodes.set(t.id, { li, cb, title, hint, ta, noteBox, noteBtn, del, task: t });
+  return li;
+}
+
+function paintTask(id) {
+  const n = nodes.get(id), t = n.task;
+  n.li.classList.toggle('is-done', !!t.done);
+  n.cb.checked = !!t.done;
+  n.title.textContent = t.t || '';
+  n.hint.textContent = t.h || ''; n.hint.hidden = !t.h;
+  if (document.activeElement !== n.ta) n.ta.value = t.note || '';
+  const show = open.has(id) || !!(t.note && t.note.trim());
+  n.noteBox.hidden = !show;
+  n.noteBtn.textContent = show ? 'Hide note' : 'Add a note';
+  n.noteBtn.hidden = !canWrite && !t.note;
+  n.del.hidden = !canWrite || !t.mine;
+  n.li.hidden = (filter === 'open' && t.done) || (filter === 'done' && !t.done);
+}
+
+function render() {
+  const root = $('#phases');
+  if (!root.children.length) {
+    PHASES.forEach(([name, when], i) => {
+      const sec = el('section', 'phase'); sec.dataset.p = i;
+      const head = el('div', 'phase__head');
+      head.append(el('h2', '', name), el('span', 'phase__when', when), el('span', 'phase__left'));
+      const ul = el('ul', 'list');
+      sec.append(head, ul);
+      if (canWrite) {
+        const form = el('form', 'add');
+        const inp = el('input'); inp.type = 'text'; inp.id = 'add-' + i; inp.placeholder = 'Add a to-do here'; inp.setAttribute('aria-label', 'Add a to-do to ' + name); inp.maxLength = 160;
+        const btn = el('button', '', 'Add'); btn.type = 'submit';
+        form.append(inp, btn);
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const v = inp.value.trim(); if (!v) return;
+          const last = tasks.filter((t) => t.p === i).reduce((m, t) => Math.max(m, t.o || 0), 0);
+          inp.value = '';
+          col.add({ p: i, o: last + 10, t: v, h: '', done: false, note: '', mine: true }).catch(() => { inp.value = v; });
+        });
+        sec.append(form);
+      }
+      root.append(sec);
+    });
+  }
+  const seen = new Set();
+  PHASES.forEach((_, i) => {
+    const sec = root.children[i], ul = $('.list', sec);
+    const mine = tasks.filter((t) => t.p === i).sort((a, b) => (a.o || 0) - (b.o || 0));
+    mine.forEach((t, idx) => {
+      seen.add(t.id);
+      let n = nodes.get(t.id);
+      if (!n) { taskNode(t); n = nodes.get(t.id); } else n.task = t;
+      if (ul.children[idx] !== n.li) ul.insertBefore(n.li, ul.children[idx] || null);
+      paintTask(t.id);
+    });
+    const left = mine.filter((t) => !t.done).length;
+    $('.phase__left', sec).textContent = mine.length ? (left ? left + ' to do' : 'All done') : '';
+  });
+  for (const [id, n] of nodes) if (!seen.has(id)) { n.li.remove(); nodes.delete(id); }
+  const done = tasks.filter((t) => t.done).length;
+  $('#count').textContent = `${done} of ${tasks.length} done`;
+  $('#fill').style.width = tasks.length ? (done / tasks.length * 100).toFixed(1) + '%' : '0';
+}
+
+document.querySelectorAll('.filters button').forEach((b) => b.addEventListener('click', () => {
+  filter = b.dataset.f;
+  document.querySelectorAll('.filters button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  render();
+}));
+
+async function start() {
+  const use = window.claude && window.claude.use;
+  const db = use ? await window.claude.use('db') : null;
+  if (!db) { showState('Sign in to see the list', 'The shared list opens for people signed in to Claude who have been given this page. Ask Hari for access.'); return; }
+  const user = await window.claude.use('user');
+  if (user) { const can = await user.can('data.write'); if (can === false) canWrite = false; }
+  col = db.collection('tasks');
+  const slow = setTimeout(() => showState('Still opening…', 'This is taking longer than usual. Check your connection and open the page again.'), 10000);
+  col.onSnapshot((snap) => {
+    clearTimeout(slow);
+    tasks = snap.docs.map((d) => Object.assign({ id: d.id }, d.data()));
+    if (!tasks.length) { showState('Nothing here yet', 'The list is empty. Add the first to-do under any heading below.'); }
+    else $('#state').hidden = true;
+    $('#bar').hidden = !tasks.length;
+    render();
+  }, (e) => {
+    clearTimeout(slow);
+    showState('The list could not be opened', e && e.code === 'not_granted' ? 'You have not been given access to the shared list.' : 'Check your connection and open the page again.');
+  });
+}
+start().catch((err) => { console.warn('[tracker]', err); showState('The list could not be opened', 'Open the page again in a moment.'); });
+</script>
