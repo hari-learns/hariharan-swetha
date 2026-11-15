@@ -7,6 +7,7 @@
 <meta name="description" content="You are invited to the wedding of Hariharan and Swetha. Tap the seal to open your invitation.">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#8fa46b">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preload" href="fonts/cormorant-garamond.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/cormorant-garamond-italic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="styles.css">
@@ -135,11 +136,7 @@
 
 
 
-    <section class="sec sec--bless" id="bless" aria-labelledby="blessTitle">
-      <svg class="sec__icon rv" width="30" height="30" aria-hidden="true"><use href="#i-flower"/></svg>
-      <h2 class="sec__title rv" id="blessTitle" data-t="blessTitle">Shower your blessings</h2>
-      <div class="dots rv" aria-hidden="true"><i></i><i></i><i></i></div>
-      <p class="prose rv" data-t="blessText">Tap the plate of flowers. Every tap sends petals our way.</p>
+    <section class="sec sec--bless" id="bless" aria-label="Flowers">
       <button class="plate rv" id="plate" type="button">
         <svg viewBox="0 0 220 130" aria-hidden="true">
           <ellipse class="p-shadow" cx="110" cy="112" rx="92" ry="12"/>
@@ -154,7 +151,6 @@
         </svg>
         <span class="vh" data-t="blessBtn">Shower petals</span>
       </button>
-      <p class="bless__count rv" id="blessCount" aria-live="polite"></p>
     </section>
 
     <section class="sec sec--rsvp" id="rsvp" aria-labelledby="rsvpTitle">
@@ -180,11 +176,9 @@
         </div>
         <p class="rsvp__error" id="rsvpError" role="alert" hidden data-t="fNeedName">Please tell us your name.</p>
         <button class="btn btn--wide" type="submit"><span data-t="fSend">Let Hari and Swetha know</span></button>
-        <p class="rsvp__hint" data-t="fHint">This opens WhatsApp with your reply written out. Press send there and it reaches us.</p>
       </form>
       <div class="rsvp__done" id="rsvpDone" hidden tabindex="-1">
         <p class="after__line" data-t="thanks">Thank you</p>
-        <p class="prose" id="rsvpDoneText"></p>
         <button class="textbtn" id="rsvpAgain" type="button" data-t="again">Change my reply</button>
       </div>
     </section>

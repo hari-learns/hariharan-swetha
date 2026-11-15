@@ -53,8 +53,7 @@ function calendarEvents() {
 }
 
 function blessLine() {
-  const n = state.blessings;
-  $('#blessCount').textContent = n === 0 ? '' : n === 1 ? S().blessOne : S().blessMany(n);
+  /* the plate no longer shows a count */
 }
 
 function applyLang() {
@@ -110,7 +109,6 @@ function applyLang() {
   if (iOS) ics.removeAttribute('download');
   $('#gcalBtn').href = googleCalUrl(evs[0]);
 
-  if (!$('#rsvpDone').hidden) $('#rsvpDoneText').textContent = s.doneYes(state.guests);
   fitNames();
   state.painted = true;
 }
@@ -221,6 +219,22 @@ function initSections() {
     blessLine();
   });
 
+  // the plate showers by itself, five times, the first time it scrolls into view
+  if ('IntersectionObserver' in window) {
+    const once = new IntersectionObserver((ents) => {
+      if (!ents[0].isIntersecting) return;
+      once.disconnect();
+      plate.classList.remove('is-idle');
+      for (let i = 0; i < 5; i++) setTimeout(() => {
+        const r = plate.getBoundingClientRect(), c = column();
+        fx.burst(r.left + r.width / 2, r.top + r.height * 0.42, 22, 0.8);
+        if (i % 2 === 0) fx.rain(14, c.left, c.right);
+        sound.play('petal');
+      }, 350 + i * 750);
+    }, { threshold: 0.6 });
+    once.observe(plate);
+  }
+
   // RSVP
   const form = $('#rsvpForm'), done = $('#rsvpDone'), out = $('#gOut'), err = $('#rsvpError'), fName = $('#fName');
   const setGuests = (n) => { state.guests = clamp(n, 1, 12); out.textContent = String(state.guests); };
@@ -238,7 +252,6 @@ function initSections() {
     const a = el('a', { href: `https://wa.me/${num}?text=${encodeURIComponent(msg)}`, target: '_blank', rel: 'noopener' });
     document.body.append(a); a.click(); a.remove();
     form.hidden = true; done.hidden = false;
-    $('#rsvpDoneText').textContent = s.doneYes(state.guests);
     done.focus({ preventScroll: true });
     const c = column(); fx.rain(30, c.left, c.right); sound.play('sparkle');
   });

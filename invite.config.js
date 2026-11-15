@@ -41,8 +41,8 @@ window.INVITE = {
   },
 
   welcome: {
-    en: "With the blessings of our parents and elders, we invite you to the day two families become one. All we need is your presence.",
-    ta: "எங்கள் பெற்றோர் மற்றும் பெரியோர்களின் ஆசியுடன், இரு குடும்பங்கள் ஒன்றாகும் இந்த இனிய நாளுக்கு உங்களை அன்புடன் அழைக்கிறோம். உங்கள் வருகை ஒன்றே எங்களுக்குப் போதும்.",
+    en: "With the blessings of our parents and elders, we invite you to the day two families become one.\nAll we need is your presence.",
+    ta: "எங்கள் பெற்றோர் மற்றும் பெரியோர்களின் ஆசியுடன், இரு குடும்பங்கள் ஒன்றாகும் இந்த இனிய நாளுக்கு உங்களை அன்புடன் அழைக்கிறோம்.\nஉங்கள் வருகை ஒன்றே எங்களுக்குப் போதும்.",
   },
 
   venue: {
