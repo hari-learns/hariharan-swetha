@@ -183,13 +183,24 @@ export class Sound {
     this.musicOn = true;
     if (!this.file) { this.melody(); return; }
     // the couple's own track; if it is missing or will not play, fall back to the built-in melody
-    const a = new Audio(this.file);
+    const a = this.el || new Audio(this.file);
     a.loop = true; a.volume = 0; a.preload = 'auto';
+    try { a.currentTime = 0; } catch (e) { /* not loaded yet */ }
     a.play().then(() => {
       this.el = a;
       let v = 0;
       const up = setInterval(() => { v = Math.min(0.7, v + 0.035); a.volume = v; if (v >= 0.7) clearInterval(up); }, 120);
-    }).catch((err) => { console.warn('[sound] music file not playing, using the built-in melody:', err && err.name); this.melody(); });
+    }).catch((err) => { this.el = null; console.warn('[sound] music file not playing, using the built-in melody:', err && err.name); this.melody(); });
+  }
+
+  // Phones only let a page start a track from inside a tap. The music begins seconds after the tap,
+  // so the track is woken silently here, during the tap, and held until startMusic().
+  prime() {
+    if (!this.file || this.el) return;
+    const a = new Audio(this.file);
+    a.loop = true; a.volume = 0; a.preload = 'auto';
+    this.el = a;
+    a.play().then(() => { if (!this.musicOn) a.pause(); }).catch(() => { this.el = null; });
   }
 
   melody() {

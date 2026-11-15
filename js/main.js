@@ -147,7 +147,7 @@ async function startSound(withPress) {
   if (!ok) return;
   soundBtn.setAttribute('aria-pressed', 'true');
   if (withPress) { sound.play('press'); setTimeout(() => sound.play('doors'), 240); }
-  if (state.opened) sound.startMusic();          // the music comes in with the tap, under the doors
+  if (state.revealed) sound.startMusic();        // the opening keeps its own chimes; the music waits for the stage
 }
 
 function beat(name) {
@@ -182,7 +182,7 @@ function openInvite(instant = false) {
   state.opened = true;
   hero.classList.remove('is-closed');
   const quick = instant || reducedMotion();
-  if (C.sound !== false && !instant) startSound(true);
+  if (C.sound !== false && !instant) { sound.prime(); startSound(true); }
   if (!quick) {
     const r = $('#seal').getBoundingClientRect();
     if (r.width) fx.dust(r.left + r.width / 2, r.top + r.height / 2, 36);
