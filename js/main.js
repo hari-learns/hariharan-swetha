@@ -88,6 +88,12 @@ function applyLang() {
   $('#footTag').textContent = C.couple.hashtag || '';
   $('#monoLabel').textContent = lang === 'ta' ? 'விநாயகர்' : 'Lord Ganesha';
   blessLine();
+  const mc = C.musicFile && C.musicCredit;
+  $('#credit').hidden = !mc;
+  if (mc) {
+    const link = $('#creditLink'); link.textContent = mc.title; link.href = mc.url;
+    $('#creditBy').textContent = mc.by ? (lang === 'ta' ? ` · ${mc.by}` : ` by ${mc.by}`) : '';
+  }
 
   langBtn.hidden = !C.languageSwitch;
   langBtn.textContent = lang === 'en' ? 'தமிழ்' : 'English';

@@ -20,7 +20,11 @@ body { background: var(--bg); color: var(--ink); font-family: var(--text); font-
 h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2rem, 1.3rem + 3.4vw, 3rem); line-height: 1.05; margin: 0; text-wrap: balance; }
 .sub { margin: 8px 0 0; color: var(--soft); max-width: 60ch; }
 .facts { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 0; padding: 0; list-style: none; }
-.facts li { background: var(--sage-fill); padding: 7px 11px; font-weight: 600; font-size: 14px; }
+.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.facts li { background: var(--sage-fill); padding: 12px; min-width: 0; }
+.facts b { display: block; font-family: var(--display); font-size: 1.6rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.facts span { display: block; margin-top: 4px; font-size: 13.5px; font-weight: 600; color: var(--soft); }
+@media (max-width: 560px) { .facts { grid-template-columns: 1fr; } .facts li { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; } .facts span { margin: 0; text-align: right; } }
 .bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 14px 12px; margin-top: 18px; }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
 .bar__row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
@@ -80,11 +84,11 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 <div class="wrap">
   <header>
     <h1>Hari &amp; Swetha: wedding to-do list</h1>
-    <p class="sub">Temple wedding in the morning, reception on the lawn at New Woodlands. Tick things off and leave a note; everyone with this page sees it at once.</p>
-    <ul class="facts">
-      <li>Reception: Thursday, 11 March 2027</li>
-      <li id="daysLeft"></li>
-      <li>New Woodlands, RK Salai</li>
+    <p class="sub">Temple wedding, a simple temple engagement the next day, and the reception on the lawn at New Woodlands a month later. Tick things off and leave a note; everyone with this page sees it at once.</p>
+    <ul class="facts" id="facts">
+      <li><b id="dWed"></b><span>Wedding · Wed 10 Feb 2027 · temple</span></li>
+      <li><b id="dEng"></b><span>Engagement · Thu 11 Feb 2027 · temple</span></li>
+      <li><b id="dRec"></b><span>Reception · Thu 11 Mar 2027 · Woodlands</span></li>
     </ul>
   </header>
 
@@ -147,7 +151,6 @@ const PHASES = [
   ['Do first', ''], ['Bookings', ''], ['Shopping and stay', ''], ['Invitations and counts', ''],
   ['Last two weeks', ''], ['Wedding week', ''], ['After the wedding', ''],
 ];
-const WEDDING = new Date('2027-03-11T00:00:00+05:30');
 const $ = (s, r = document) => r.querySelector(s);
 const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
 
@@ -155,8 +158,13 @@ let tasks = [], filter = 'all', canWrite = true, col = null;
 const open = new Set(), timers = new Map(), nodes = new Map();
 
 (function days() {
-  const d = Math.ceil((WEDDING - Date.now()) / 86400000);
-  $('#daysLeft').textContent = d > 1 ? d + ' days to the reception' : d === 1 ? 'Tomorrow' : d === 0 ? 'Today' : 'Married';
+  const left = (iso) => {
+    const d = Math.ceil((new Date(iso) - Date.now()) / 86400000);
+    return d > 1 ? d + ' days to go' : d === 1 ? 'Tomorrow' : d === 0 ? 'Today' : 'Done';
+  };
+  $('#dWed').textContent = left('2027-02-10T00:00:00+05:30');
+  $('#dEng').textContent = left('2027-02-11T00:00:00+05:30');
+  $('#dRec').textContent = left('2027-03-11T00:00:00+05:30');
 })();
 
 function showState(title, text) { $('#state').hidden = false; $('#stateTitle').textContent = title; $('#stateText').textContent = text; }

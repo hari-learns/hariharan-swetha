@@ -355,6 +355,8 @@ textarea.field__input { resize: vertical; min-height: 96px; }
 .foot__love { font-style: italic; font-weight: 600; font-size: 20px; }
 .foot__names { margin: 4px 0 8px; font-family: var(--script); font-size: clamp(36px, calc(var(--u) * 40), 52px); line-height: 1.15; }
 .foot__tag { margin-bottom: 28px; font-weight: 700; font-size: 14px; letter-spacing: .14em; color: var(--gold-ink); overflow-wrap: anywhere; }
+.foot__credit { margin-top: 26px; font-size: 15px; font-weight: 600; color: var(--ink-soft); overflow-wrap: anywhere; }
+.foot__credit a { display: inline-block; padding-block: 10px; color: var(--sage-dark); font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; text-decoration-color: var(--gold); }
 .foot__copied { min-height: 1.5em; margin-top: 12px; font-style: italic; font-weight: 600; }
 
 /* petals, confetti, gold dust */

@@ -15,6 +15,8 @@ window.INVITE = {
   // Put an mp3 in this folder and name it here to play it instead of the built-in melody, e.g. "music.mp3".
   // If the file is missing the built-in melody plays.
   musicFile: "music.mp3",
+  // shown at the very end of the page as:  Music: <title> by <by>  (the title links to url)
+  musicCredit: { title: "South Indian Instrument Music", by: "dhevigavalampuri", url: "https://pixabay.com/music/india-south-indian-instrument-music-433586/" },
 
   couple: {
     groom: {
