@@ -8,7 +8,7 @@
   - When every SAMPLE line is real, set  draft: false  and the small "sample details" tag disappears.
 */
 window.INVITE = {
-  draft: true,                 // true shows a small "sample details" tag on the page
+  draft: false,                // true shows a small "sample details" tag on the page
   startLanguage: "en",         // "en" or "ta"
   languageSwitch: false,       // each language has its own link: add ?lang=ta or ?lang=en. true also shows a switch button
   sound: true,                 // music starts when the guest taps the seal
